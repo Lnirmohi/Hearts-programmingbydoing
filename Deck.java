@@ -6,8 +6,8 @@ public class Deck{
         
         for( int i = 2; i < 15; i++ ) {
             
-            Cards c1 = new Cards( spade, i);    Cards c3 = new Cards( heart,    i);
-            Cards c2 = new Cards( club,  i);    Cards c4 = new Cards( diamond,  i);
+            Cards c1 = new Cards( spade, i);    Cards c3 = new Cards( heart,   i);
+            Cards c2 = new Cards( club,  i);    Cards c4 = new Cards( diamond, i);
             
             cards.add(c1);  cards.add(c2);      cards.add(c3);  cards.add(c4);
         }

@@ -14,15 +14,10 @@ public class Hearts {
                              Q = 12,
                              K = 13;
     
-    private static final String spade =   "SPADE",
-                                 club =    "CLUB",
-                                heart =   "HEART",
-                              diamond = "DIAMOND";
-                             
-    static final int[] sequence1 = new int[]{ 0, 1, 2, 3 };//sequence to follow if player1 has 2OF CLUBS
-    static final int[] sequence2 = new int[]{ 1, 2, 3, 0 };//sequence to follow if player2 has 2OF CLUBS
-    static final int[] sequence3 = new int[]{ 2, 3, 0, 1 };//sequence to follow if player3 has 2OF CLUBS
-    static final int[] sequence4 = new int[]{ 3, 0, 1, 2 };//sequence to follow if player4 has 2OF CLUBS 
+    private static final String SPADE =   "SPADE",
+                                 CLUB =    "CLUB",
+                                HEART =   "HEART",
+                              DIAMOND = "DIAMOND"; 
     
     //deck of 52 cards
     private static List<Cards> cards = new ArrayList<Cards>(52);
@@ -40,7 +35,7 @@ public class Hearts {
     
     Scanner scan =  new Scanner(System.in);
     
-    public static void main( String[] args) {
+    public static void main( String[] args ) {
         
         Hearts hearts = new Hearts(); 
         
@@ -85,7 +80,7 @@ public class Hearts {
                             "\nPlayer 3: " + player[2].playerName + "\nPlayer 4: " + player[3].playerName + "\n" );
         
         //initialize a deck with cards
-        deck.initializeDeck( spade, club, heart, diamond, cards );
+        deck.initializeDeck( SPADE, CLUB, HEART, DIAMOND, cards );
         
         deck.shuffleCards( cards );
         
@@ -121,16 +116,16 @@ public class Hearts {
             //find which player has 2 OF CLUBS.
             beginHand( has2OfClub() );
             
-        }while( false ); //points[0] != 100 && points[1] != 100 && points[2] != 100 && points[3] != 100 
+        }while(false); //points[0] != 100 && points[1] != 100 && points[2] != 100 && points[3] != 100 
     }
     
     void distributeCards() {
         
         //distributes cards among players
-        for( int i = 0; i < 13; i++ ) {
+        for( int i = 0; i < 52; ) {
                 
-            player[0].playerHand.add( cards.get(i)    );   player[1].playerHand.add( cards.get(i+13) );
-            player[2].playerHand.add( cards.get(i+26) );   player[3].playerHand.add( cards.get(i+39) );
+            player[0].playerHand.add( cards.get(i++) );   player[1].playerHand.add( cards.get(i++) );
+            player[2].playerHand.add( cards.get(i++) );   player[3].playerHand.add( cards.get(i++) );
         }
         
         //sorting each player's hand
@@ -139,33 +134,21 @@ public class Hearts {
     
     Player has2OfClub() {
         
-        Cards beginning = new Cards( club, 2 );
+        for(int i = 0; i < 4; i++ ) {
+            
+           if( player[i].playerHand.get(0).suit.equals("CLUB") &&  player[i].playerHand.get(0).value == 2 ) {
+            
+               gameNotifications( player[i].playerName );
+               return  player[i];
+           }
+        }
         
-        if( player1.playerHand.contains( beginning )  ) {
-            
-            gameNotifications( player[0].playerName );
-            return player1;
-        }
-        else if( player2.playerHand.contains( beginning )  ) {
-            
-            gameNotifications( player[1].playerName );
-            return player2;
-        }
-        else if( player1.playerHand.contains( beginning )  ) {
-            
-            gameNotifications( player[2].playerName );
-            return player3;
-        }
-        else {
-            
-            gameNotifications( player[3].playerName );
-            return player4;
-        }
+        return null;
     }
     
     void gameNotifications( String player ) {
         
-        System.out.print( "\nThe 2 OF CLUBS starts the game." + player + " play 2 OF CLUBS." );
+        System.out.println( "\nThe 2 OF CLUB starts the game.  " + player + " play 2 OF CLUB." );
     }
     
     void displayHand( List<Cards> playerHand ) {
@@ -180,26 +163,27 @@ public class Hearts {
     //for test
     void displayHand1() {
         
+        System.out.println();
+        
         for( int i = 0; i < 13; i++ ) {
             
-            System.out.println( player1.playerHand.get(i) + "\t" + player2.playerHand.get(i) + "\t" + player3.playerHand.get(i)+ "\t" + player4.playerHand.get(i) );
+            System.out.println( player1.playerHand.get(i) + "\t" + player2.playerHand.get(i) + "\t"
+                              + player3.playerHand.get(i) + "\t" + player4.playerHand.get(i) );
         }
     }
    
     //firstPlayer will start the game
     void beginHand( Player fisrtPlayer ) {
         
-        if( fisrtPlayer.playerName.equals(player1.playerName) ) 
-            gameLoop(sequence1);
+        MainLoop loop = new MainLoop();
+        
+        for( int i = 0; i < 4; i++ ) {
             
-        else if( fisrtPlayer.playerName.equals(player2.playerName) )
-            gameLoop(sequence2);
-            
-        else if( fisrtPlayer.playerName.equals(player3.playerName) )
-            gameLoop(sequence3);
-            
-        else if( fisrtPlayer.playerName.equals(player4.playerName) )
-            gameLoop(sequence4);
+            if( fisrtPlayer.playerName.equals(player[i].playerName) ){
+                loop.mainLoop( player[i].playerName, player );
+                break;
+            }
+        }
     }
     
     void passCards() {
@@ -274,14 +258,16 @@ public class Hearts {
             removingCards( i, firstCard, secondCard, thirdCard );//removes cards from playerHand
         }
         
+        int[] cardPassingSequence = new int[]{ 1, 2, 3, 0 };
+        
         //finally adding passed cards to players
         //from cards list to playerhand
         //sequence2 array is used to loop through players array
-        for( int k = 0, l = 0; k < sequence2.length; k++, l += 3 ) {
+        for( int k = 0, l = 0; k < cardPassingSequence.length; k++, l += 3 ) {
                 
-            player[sequence2[k]].playerHand.add( cards.get(0+l) );//adding 'l' i.e 3, 6, 9 to increase
-            player[sequence2[k]].playerHand.add( cards.get(1+l) );//cards index
-            player[sequence2[k]].playerHand.add( cards.get(2+l) );
+            player[cardPassingSequence[k]].playerHand.add( cards.get(0+l) );//adding 'l' i.e 3, 6, 9 to increase
+            player[cardPassingSequence[k]].playerHand.add( cards.get(1+l) );//cards index
+            player[cardPassingSequence[k]].playerHand.add( cards.get(2+l) );
         }
         
         sortHand();
@@ -308,15 +294,6 @@ public class Hearts {
             
             Collections.sort( player[i].playerHand, new sortByValue() );
             Collections.sort( player[i].playerHand, new sortBySuit()  );
-        }
-    }
-    
-    void gameLoop( int[] sequence ) {
-        
-        //int[] sequence = seq;
-        for( int i = 0; i < 4; i++ ) {
-            
-            
         }
     }
 }
