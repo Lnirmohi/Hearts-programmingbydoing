@@ -2,14 +2,21 @@
  * The game logic consists of  
  * The MainLoop class will run for each tr
  */
+
+import java.util.*;
+
 public class MainLoop{
+    
+    Scanner loopScan = new Scanner(System.in);
     
     final int[] SEQUENCE1 = new int[]{ 0, 1, 2, 3 };
     final int[] SEQUENCE2 = new int[]{ 1, 2, 3, 0 };
     final int[] SEQUENCE3 = new int[]{ 2, 3, 0, 1 };
     final int[] SEQUENCE4 = new int[]{ 3, 0, 1, 2 };
     
-    int[] sequence;
+    private int[] sequence;
+    
+    Cards[] handContainer = new Cards[4];
     
     void mainLoop( String firstPlayer, Player[] player ){    //playerWith2OfClub - name of player holding 2 OF CLUB
         
@@ -19,7 +26,7 @@ public class MainLoop{
             
             for( int j = 0; j < 4; j++ ){
                 
-                
+                playCard( j, player[sequence[j]] );
             }
         }
     }
@@ -39,5 +46,12 @@ public class MainLoop{
         }
         
         return null;
+    }
+    
+    void playCard( int j, Player player){
+        
+        System.out.println( player.playerName + "'s turn. Play a valid card.");
+        
+        handContainer[j] =  player.playerHand.remove(loopScan.nextInt());
     }
 }
