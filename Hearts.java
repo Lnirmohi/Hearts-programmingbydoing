@@ -45,7 +45,6 @@ public class Hearts {
     void playerSelection() {
         
         int noOfPlayers = -1;
-        boolean validation = true;
         
         //input validation
         while( noOfPlayers < 1 || noOfPlayers > 4 ) {
@@ -53,7 +52,7 @@ public class Hearts {
             System.out.println( "\nChoose how many players will play(1-4): " );
             
             ///input validation
-            try {
+            try{
                  
                 noOfPlayers = scan.nextInt();
             }
@@ -73,28 +72,16 @@ public class Hearts {
             
             System.out.print( "\nEnter " + (i+1) + " player's name : " );
             
-            player[i].playerName = scan.nextLine().toUpperCase();    System.out.println();
+            player[i].playerName = scan.nextLine().toUpperCase();
         } 
         
-        System.out.println( "\nPlayer 1: " + player[0].playerName + "\nPlayer 2: " + player[1].playerName +
-                            "\nPlayer 3: " + player[2].playerName + "\nPlayer 4: " + player[3].playerName + "\n" );
+        System.out.println( "\n\nPlayer 1: " + player[0].playerName + "\nPlayer 2: " + player[1].playerName +
+                              "\nPlayer 3: " + player[2].playerName + "\nPlayer 4: " + player[3].playerName + "\n" );
         
-        //initialize a deck with cards
+        //fills a deck with cards
         deck.initializeDeck( SPADE, CLUB, HEART, DIAMOND, cards );
         
-        deck.shuffleCards( cards );
-        
-        distributeCards();
-        
-        cards.clear();
-        
-        //ask players to pass cards to players on their left.
-        passCards();
-        
-        //find which player has 2 OF CLUBS.
-        beginHand( has2OfClub() );
-
-        displayHand1();
+        startGame();
     }
     
     void startGame() {
@@ -103,20 +90,24 @@ public class Hearts {
             //shuffles deck
             cards = deck.shuffleCards( cards );
             
-            //distributes card among players using subList Method and
-            //sort hand of each player with the help of Collection.sort and comparator interface.
+            //distributes card among players and sort hand of each
+            //player with the help of Collection.sort and comparator interface.
             distributeCards();
             
             //clear the card list to accumlate 12 cards passed by players. 
             cards.clear();
             
             //ask players to pass cards to players on their left.
-            passCards();
+            choseCardsToPass();
+             
+            cards.clear();
             
             //find which player has 2 OF CLUBS.
             beginHand( has2OfClub() );
             
-        }while(false); //points[0] != 100 && points[1] != 100 && points[2] != 100 && points[3] != 100 
+            //for test
+            player[0].points += 20;
+        }while( player1.points != 100 && player2.points != 100 && player3.points != 100 && player4.points != 100 ); 
     }
     
     void distributeCards() {
@@ -155,7 +146,6 @@ public class Hearts {
         
         for( int i = 0; i < playerHand.size(); i++ ) {
             
-            //System.out.println( player1.playerHand.get(i) + "\t" + player2.playerHand.get(i) + "\t" + player3.playerHand.get(i)+ "\t" + player2.playerHand.get(i) );
             System.out.println( (i+1) + ":\t" + playerHand.get(i) );
         }
     }
@@ -180,13 +170,14 @@ public class Hearts {
         for( int i = 0; i < 4; i++ ) {
             
             if( fisrtPlayer.playerName.equals(player[i].playerName) ){
-                loop.mainLoop( player[i].playerName, player );
+                
+                loop.mainLoop( player[i].playerName, player, cards );
                 break;
             }
         }
     }
     
-    void passCards() {
+    void choseCardsToPass() {
         
         int firstCard, secondCard, thirdCard;//cards that are going to be passed to next player i.e on left
         
@@ -220,11 +211,12 @@ public class Hearts {
                     thirdCard  = scan.nextInt() - 1;
                 } catch( Exception e ) {
                     
-                    scan.next();
+                    scan.next();//consumes nextLine character
+                    firstCard = 1; secondCard = 1; thirdCard = 1;
                     continue;
                 }
                 
-                //if player enterss a less than 1 or a greater than 13
+                //if player enters a number less than 1 or a greater than 13
                 if( firstCard < 0 || firstCard > 12 || secondCard < 0 || secondCard > 12 || thirdCard < 0 || thirdCard > 12 ) {
                     
                     firstCard = 1; secondCard = 1; thirdCard = 1;
@@ -255,8 +247,15 @@ public class Hearts {
                     break;
             }
             
-            removingCards( i, firstCard, secondCard, thirdCard );//removes cards from playerHand
+            removingCards( i, firstCard, secondCard, thirdCard );//removes passed cards from playerHand
         }
+        
+        passCards();//adding passed cards to players
+
+        sortHand();
+    }
+    
+    void passCards() {
         
         int[] cardPassingSequence = new int[]{ 1, 2, 3, 0 };
         
@@ -269,8 +268,6 @@ public class Hearts {
             player[cardPassingSequence[k]].playerHand.add( cards.get(1+l) );//cards index
             player[cardPassingSequence[k]].playerHand.add( cards.get(2+l) );
         }
-        
-        sortHand();
     }
     
     void removingCards( int i, int firstCard, int secondCard, int thirdCard ) {

@@ -2,16 +2,23 @@
  * The game logic consists of  
  * The MainLoop class will run for each tr
  */
+
+import java.util.*;
+
 public class MainLoop{
+    
+    Scanner loopScan = new Scanner(System.in);
     
     final int[] SEQUENCE1 = new int[]{ 0, 1, 2, 3 };
     final int[] SEQUENCE2 = new int[]{ 1, 2, 3, 0 };
     final int[] SEQUENCE3 = new int[]{ 2, 3, 0, 1 };
     final int[] SEQUENCE4 = new int[]{ 3, 0, 1, 2 };
     
-    int[] sequence;
+    private int[] sequence;
     
-    void mainLoop( String firstPlayer, Player[] player ){    //playerWith2OfClub - name of player holding 2 OF CLUB
+    Cards[] handContainer = new Cards[4];
+    
+    void mainLoop( String firstPlayer, Player[] player, List<Cards> cards ){    //playerWith2OfClub - name of player holding 2 OF CLUB
         
         for( int i = 0; i < 13; i++ ){
             
@@ -19,7 +26,13 @@ public class MainLoop{
             
             for( int j = 0; j < 4; j++ ){
                 
+                playCard( j, player[sequence[j]] );
+            }
+            
+            for( int j = 0; j < 4; j++ ){
                 
+                System.out.println( handContainer[j] );
+                cards.add( handContainer[j] );
             }
         }
     }
@@ -39,5 +52,22 @@ public class MainLoop{
         }
         
         return null;
+    }
+    
+    void playCard( int j, Player player ){
+
+        displayHand( player.playerHand );
+        
+        System.out.print( "\n" + player.playerName + "'s turn. Play a valid card: ");
+        
+        handContainer[j] =  player.playerHand.remove( loopScan.nextInt() - 1 );
+    }
+    
+    void displayHand( List<Cards> playerHand ) {
+        
+        for( int i = 0; i < playerHand.size(); i++ ) {
+            
+            System.out.println( (i+1) + ":\t" + playerHand.get(i) );
+        }
     }
 }
