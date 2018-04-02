@@ -67,7 +67,12 @@ public class MainLoop{
         
         for( int i = 0; i < playerHand.size(); i++ ) {
             
-            System.out.println( (i+1) + ":\t" + playerHand.get(i) );
+            System.out.println( (i+1) + ":\t" + playerHand.get(i) );            
         }
+    }
+    
+    boolean validCard() {
+        
+        return true;
     }
 }
