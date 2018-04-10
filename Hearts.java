@@ -9,29 +9,27 @@ import java.util.*;
 
 public class Hearts {
     
-    private static final int A = 14,
-                             J = 11,
-                             Q = 12,
-                             K = 13;
+    private final int A = 14,
+                      J = 11,
+                      Q = 12,
+                      K = 13;
     
-    private static final String SPADE =   "SPADE",
-                                 CLUB =    "CLUB",
-                                HEART =   "HEART",
-                              DIAMOND = "DIAMOND"; 
+    private final String SPADE =   "SPADE",
+                         CLUB =    "CLUB",
+                         HEART =   "HEART",
+                         DIAMOND = "DIAMOND"; 
     
     //deck of 52 cards
-    private static List<Cards> cards = new ArrayList<Cards>(52);
+    private List<Cards> cards = new ArrayList<Cards>(52);
     
     //player objects of type Player initilized with names and 0 pts
-    private static Player player1 = new Player( "SOUTH", 0 );
-    private static Player player2 = new Player( "WEST" , 0 );
-    private static Player player3 = new Player( "NORTH", 0 );
-    private static Player player4 = new Player( "EAST" , 0 );
+    private Player player1 = new Player( "SOUTH", 0 );
+    private Player player2 = new Player( "WEST" , 0 );
+    private Player player3 = new Player( "NORTH", 0 );
+    private Player player4 = new Player( "EAST" , 0 );
 
     //default player array names: SOUTH WEST NORTH EAST
-    private static Player[] player = new Player[]{ player1, player2, player3, player4 };
-    
-    Deck deck = new Deck();
+    private Player[] player = new Player[]{ player1, player2, player3, player4 };
     
     Scanner scan =  new Scanner(System.in);
     
@@ -76,15 +74,17 @@ public class Hearts {
         } 
         
         System.out.println( "\n\nPlayer 1: " + player[0].playerName + "\nPlayer 2: " + player[1].playerName +
-                              "\nPlayer 3: " + player[2].playerName + "\nPlayer 4: " + player[3].playerName + "\n" );
-        
-        //fills a deck with cards
-        deck.initializeDeck( SPADE, CLUB, HEART, DIAMOND, cards );
+                              "\nPlayer 3: " + player[2].playerName + "\nPlayer 4: " + player[3].playerName + "\n" ); 
         
         startGame();
     }
     
     void startGame() {
+        
+        Deck deck = new Deck();
+        
+        //fills a deck with cards
+        deck.initializeDeck( SPADE, CLUB, HEART, DIAMOND, cards );
         
         do{
             //shuffles deck
@@ -149,18 +149,6 @@ public class Hearts {
             System.out.println( (i+1) + ":\t" + playerHand.get(i) );
         }
     }
-    
-    //for test
-    void displayHand1() {
-        
-        System.out.println();
-        
-        for( int i = 0; i < 13; i++ ) {
-            
-            System.out.println( player1.playerHand.get(i) + "\t" + player2.playerHand.get(i) + "\t"
-                              + player3.playerHand.get(i) + "\t" + player4.playerHand.get(i) );
-        }
-    }
    
     //firstPlayer will start the game
     void beginHand( Player fisrtPlayer ) {
@@ -177,39 +165,39 @@ public class Hearts {
         }
     }
     
-    void choseCardsToPass() {
+    void choseCardsToPass(){
         
         int firstCard, secondCard, thirdCard;//cards that are going to be passed to next player i.e on left
         
         System.out.println( "\nPass 3 cards to player on your left\n" );
         
-        for( int i = 0; i < 4; i++ ) {
+        for( int i = 0; i < 4; i++ ){
             
             firstCard = 1; secondCard = 1; thirdCard = 1;
             
             if( i == 3 )
-                System.out.println( "\n" + player[i].playerName + " pass 3 cards to " +  player[0].playerName + ".\n");
+                System.out.println( "\n" + player[i].playerName + " pass 3 cards to " +  player[0].playerName + ".\n"   );
             else
                 System.out.println( "\n" + player[i].playerName + " pass 3 cards to " +  player[i+1].playerName + ".\n" );
             
             displayHand( player[i].playerHand );
             
             //for input validation and check if user has chose three different card
-            while( firstCard == secondCard || secondCard == thirdCard || firstCard == thirdCard ) {
+            while( firstCard == secondCard || secondCard == thirdCard || firstCard == thirdCard ){
                 
                 System.out.println( "\nPlease select three DIFFERENT number in front of cards you want to pass(1-13):" );
                 
-                try {
+                try{
                     
                     System.out.print( "First  Card: " );
-                    firstCard  = scan.nextInt() - 1;
+                    firstCard  = scan.nextInt() - 1;//array tarts from index 0
                     
                     System.out.print( "Second Card: " );
                     secondCard = scan.nextInt() - 1;
                     
                     System.out.print( "Third  Card: " );
                     thirdCard  = scan.nextInt() - 1;
-                } catch( Exception e ) {
+                }catch( Exception e ){
                     
                     scan.next();//consumes nextLine character
                     firstCard = 1; secondCard = 1; thirdCard = 1;
@@ -225,7 +213,7 @@ public class Hearts {
             }
             
             //for loop will sort card nos i.e firstCard, secondCard, thirdCard in ascending order
-            //in case player enters nos are out of sequence
+            //in case player enters nos which are not in sequence
             for( int j = 1; j < 4; j++ ) {
                 
                 int temp;
