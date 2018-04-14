@@ -4,6 +4,7 @@ public class Deck{
 
     void initializeDeck( String spade, String club, String heart, String diamond, List<Cards> cards ) {
         
+        //creating deck of 4 suits, each containing 13 cards.
         for( int i = 2; i < 15; i++ ) {
             
             Cards c1 = new Cards( spade, i);    Cards c3 = new Cards( heart,   i);

@@ -12,8 +12,10 @@ class Cards{
     
     public String toString() {
         
-        if( value > 9 ) {
-            switch (value) {
+        if(value > 9){
+            
+            switch (value){
+                
                 case 10:
                     return "10"  +  "  OF " +   suit;
                 case 11:
