@@ -12,8 +12,10 @@ class Cards{
     
     public String toString() {
         
-        if( value > 9 ) {
-            switch (value) {
+        if(value > 9){
+            
+            switch (value){
+                
                 case 10:
                     return "10"  +  "  OF " +   suit;
                 case 11:
@@ -34,7 +36,6 @@ class Cards{
 //using comparator interface to sort hand by suit
 class sortBySuit implements Comparator<Cards> {
     
-    @Override
     public int compare( Cards a, Cards b ) {
         
         return a.suit.compareTo(b.suit);
@@ -44,7 +45,6 @@ class sortBySuit implements Comparator<Cards> {
 //using comparator interface to sort hand by value
 class sortByValue implements Comparator<Cards> {
     
-    @Override
     public int compare( Cards a, Cards b ) {
         
         return a.value - b.value;
