@@ -1,28 +1,24 @@
 /*
- * The game logic consists of 13 iteration of mainloop i.e outerloop < 13.
- * 
- * For each iteration of outerloop, there is 4 iteration of innerloop i.e innerloop < 4.
- * 
- * Each iteration of innerloop asks player to play a valid card.
- * 
- * First card of first GAME i.e when outerloop & innerloop both are 0, player should play 2 of CLUB.
- * 
+ * Player holding 2 OF CLUB will begin the TRICK.
+ * The game logic consists of 13 iteration of mainloop i.e trickLoop < 13. 
+ * For each iteration of mainLoop, there is 4 iteration of trickLoop i.e innerloop < 4. 
+ * Each iteration of trickLoop asks player to play a valid card.
+ * First card of first GAME i.e when mainLoop & trickLoop both are 0, player should play 2 of CLUB.
  * First player can decide which suit to play except HEART.
- * 
  * HEART can be played only when it is broken i.e player's hand does not contain card
- * similar to suitInPlay or player is left with all HEART cards.
- * 
- * Each time a card is played, it's suit value i.e SPADE, CLUB, HEART, DIAMOND is checked.
- * 
- * All the players have to follow the suit played by first player.
- * 
+ * similar to suitInPlay or player is left with all HEART cards. 
+ * Each time a card is played, it's suit value i.e SPADE, CLUB, HEART, DIAMOND is checked. 
+ * All the players have to follow the suit played by first player. 
  * If the card played doesn't follow the suit in play i.e suitInPlay, player's hand is 
  * checked for if it contains suitInPlay or not.
- * 
- * handContainer is the container for card played in one trick.
  */
-
 import java.util.*;
+
+class LoopCount{
+
+    int  mainLoopCount;
+    int trickLoopCount;
+}
 
 public class MainLoop{
     
@@ -33,25 +29,37 @@ public class MainLoop{
     final int[] SEQUENCE3 = new int[]{ 2, 3, 0, 1 };
     final int[] SEQUENCE4 = new int[]{ 3, 0, 1, 2 };
     
-    private int[] sequence;//sequence to follow for each player.
+    //sequence to follow for each player e.g if second player starts the trick sequence will be equal to SEQUENCE2.
+    private int[] sequence;
     
+    //container for card played in one trick
     private Cards[] handContainer = new Cards[4];
     
-    private String suitInPlay = "CLUB";//suit which is to be followed by players.
+    //suit which is to be followed by players.
+    private String suitInPlay = "CLUB";
     
-    private boolean heartBroken = false;//boolean to check if heart is broken or not.
+    //boolean to check if heart is broken or not.
+    private boolean heartBroken = false;
     
     void mainLoop(Player[] player, List<Cards> cards){
+
+        heartBroken =  false;
         
-        String firstPlayer = has2OfCLUB(player);//finds first player for first time i.e when outerlopp = 0;
+        //finds first player for first time i.e when outerlopp = 0;
+        String firstPlayer = has2OfCLUB(player);
         
-        for(int outerloop = 0; outerloop < 13; outerloop++){/*==============GAME=================*/
+        LoopCount loopCount = new LoopCount();
+        
+        for(loopCount.mainLoopCount = 0; loopCount.mainLoopCount < 13; loopCount.mainLoopCount++){
             
-            sequence = decideSequence(firstPlayer, player);//decides which sequence to follow
+            //decides which sequence to follow
+            sequence = decideSequence(firstPlayer, player);
             
-            trickLoop(outerloop, player);
+            //runs 4 times each time a players turn to play a valid card
+            trickLoop(loopCount, player);
             
-            firstPlayer = whoGetsPoints(player);//decides who will start the next TRICK i.e player with card having highest value A being heighest and 2 being lowest. 
+            //decides who will start the next TRICK i.e player with card having highest value A being heighest and 2 being lowest. 
+            firstPlayer = whoGetsPoints(player);
             
             showPointsDistribution(player);
             
@@ -65,7 +73,7 @@ public class MainLoop{
             
            if( player[i].playerHand.get(0).suit.equals("CLUB") &&  player[i].playerHand.get(0).value == 2 ) {
             
-               notificationFor2OfCLUB( player[i].playerName );
+               System.out.println("\nThe 2 OF CLUB starts the game.  " + player[i].playerName + " play 2 OF CLUB.");
                
                return  player[i].playerName;
            }
@@ -74,13 +82,9 @@ public class MainLoop{
         return null;
     }
     
-    void notificationFor2OfCLUB(String player){
-        
-        System.out.println("\nThe 2 OF CLUB starts the game.  " + player + " play 2 OF CLUB.");
-    }
-    
     int[] decideSequence(String firstPlayer, Player[] player){
         
+        //return the sequence to be followed while playing the trick, each index decides player's no.
         for(int i = 0; i < 4; i++){
             
             if( firstPlayer.equals( player[0].playerName ) )
@@ -96,21 +100,25 @@ public class MainLoop{
         return null;
     }
     
-    void trickLoop(int outerloop, Player[]  player){
+    void trickLoop(LoopCount loopCount, Player[]  player){
     
-        for(int innerloop = 0; innerloop < 4; innerloop++){/*==============TRICK=================*/
-                
-            playCard(outerloop, innerloop, player[sequence[innerloop]]);//asks player to play a card.
-                
-            suitInPlay = handContainer[0].suit;//card played by first player becomes suitInPlay.
-                
-            displayInGameNotifications();//display notification after card is played.
-                
-            showHand(handContainer, innerloop);//show cards played in TRICK
+        for(loopCount.trickLoopCount = 0; loopCount.trickLoopCount < 4; loopCount.trickLoopCount++){/*==============TRICK=================*/
+            
+            //asks player to play a card.
+            playCard(loopCount, player[sequence[loopCount.trickLoopCount]]);
+            
+            //card played by first player becomes suitInPlay.
+            suitInPlay = handContainer[0].suit;
+            
+            //display notification after card is played.
+            displayInGameNotifications();
+            
+            //show cards played in TRICK
+            showHand(handContainer, loopCount.trickLoopCount);
         }
     }
     
-    void playCard(int outerloop, int innerloop, Player currentPlayer){
+    void playCard(LoopCount loopCount, Player currentPlayer){
         
         int cardPlayed;
         
@@ -118,19 +126,37 @@ public class MainLoop{
             
             displayHand(currentPlayer.playerHand);
             
-            cardPlayed = getCardNumber(-1, currentPlayer.playerName);//gets card numeber from player
+            if(currentPlayer.isPlayerHuman == true)
+                cardPlayed = getCardNumber(-1, currentPlayer.playerName); //gets card number from player
+            else{
+                
+                //if player is computer
+                cardPlayed = selectCardsForComputer(currentPlayer, loopCount);
+                System.out.print( "\n" + currentPlayer.playerName + "'s turn. Play a valid card: " + (cardPlayed+1));
+                break;
+            }
             
-            if(outerloop == 0 && innerloop == 0 && cardPlayed != 0){//first card of each GAME needs to be 2 of CLUB
+            //part below runs only if the player is not computer
+            //first card of each GAME needs to be 2 of CLUB
+            if(loopCount.mainLoopCount == 0 && loopCount.trickLoopCount == 0 && cardPlayed != 0){
             
                 System.out.println("\nPlease play 2 of CLUB!"          );
                 System.out.println("\nPlease play " + suitInPlay + "\n");
-            }
-            else if(validSuit( currentPlayer.playerHand, cardPlayed, innerloop ))// if card is valid break the loop             
+            }else if(loopCount.mainLoopCount == 0 && (currentPlayer.playerHand.get(cardPlayed).suit.equals("HEART") ||
+                    (currentPlayer.playerHand.get(cardPlayed).suit.equals("SPADE") &&
+                     currentPlayer.playerHand.get(cardPlayed).value == 12))){
+            
+                System.out.println( "\nA Heart or the Q of SPDADE cannot be played for first trick.");
+            }else  if(validSuit( currentPlayer, cardPlayed, loopCount ))// if card is valid break the loop             
                 break;
                 
         }while(true);
         
-        handContainer[innerloop] = currentPlayer.playerHand.remove( cardPlayed );//card is removed from player's hand and added to handContainer array
+        if(currentPlayer.playerHand.get(cardPlayed).suit.equals("HEART"))
+            heartBroken = true;
+        
+        //card is removed from player's hand and added to handContainer array
+        handContainer[loopCount.trickLoopCount] = currentPlayer.playerHand.remove( cardPlayed );
     }
     
     void displayHand(List<Cards> playerHand){
@@ -145,6 +171,7 @@ public class MainLoop{
             
             System.out.print( "\n" + playerName + "'s turn. Play a valid card: ");
             
+            //input validation
             try{
                     
                 cardPlayed = loopScan.nextInt() - 1;
@@ -162,15 +189,16 @@ public class MainLoop{
         return cardPlayed;
     }
     
-    boolean validSuit( List<Cards> playerHand, int cardPlayed, int innerloop ){
+    boolean validSuit(Player player, int cardPlayed, LoopCount loopCount){
         
         boolean containsSuit = false;
         
         try{
             
-            if( !playerHand.get(cardPlayed).suit.equals(suitInPlay) ){//checking if player has card of suit which is in play i.e suitInPlay
+            //checking if player has card of suit which is in play i.e suitInPlay if he plays card other than suitInPlay
+            if( !player.playerHand.get(cardPlayed).suit.equals(suitInPlay) ){
                 
-                containsSuit = validCard( playerHand, cardPlayed, innerloop);
+                containsSuit = validCard( player, cardPlayed, loopCount);
                 
                 return containsSuit;
             }
@@ -184,54 +212,59 @@ public class MainLoop{
         return !containsSuit;
     }
     
-    boolean validCard(List<Cards> playerHand, int cardPlayed, int innerloop){
+    boolean validCard(Player player, int cardPlayed, LoopCount loopCount){
         
-        //If card played by player is not HEART and of different suit than suitInPlay.
-        if( playerHand.get(cardPlayed).suit.equals("HEART") ){//If card played by player is HEART
+        if(loopCount.mainLoopCount == 0 && (player.playerHand.get(cardPlayed).suit.equals("HEART") ||
+                                           (player.playerHand.get(cardPlayed).suit.equals("SPADE") && player.playerHand.get(cardPlayed).value == 12)))
+            return false;
+        else if(player.playerHand.get(cardPlayed).suit.equals("HEART") ){//If card played by player is HEART
             
-            if( innerloop == 0 ){//If first card played is HEART
-                
-                if( heartBroken == false ){
-                    
-                    //to check if player hand contains all HEART card
-                    for( int n = 0; n < playerHand.size(); n++ ){
-                    
-                        if( !playerHand.get(n).suit.equals("HEART") )
-                            return ifHeartIsNotBroken();
-                    }
-                    
-                    System.out.println("\nHeart is borken!");
-                }
-            }else if( innerloop > 0 ){
-            
-                if( suitCheckingLoop(playerHand, suitInPlay) ){
-                    
-                    return false;
-                }
-                
-                System.out.println("\n\t\t\t\tHeart is borken!");
-            }
-            
-            heartBroken = true;
-        }else if( !playerHand.get(cardPlayed).suit.equals(suitInPlay) && innerloop > 0 ){//innerloop > 0 to not check first card unless it's HEART.
-            
+            return checkForHEART(loopCount, player);
+        }else if(!player.playerHand.get(cardPlayed).suit.equals(suitInPlay) && loopCount.trickLoopCount > 0){//trickLoopCount > 0 to not check first card unless it's HEART.
+
             //if player's hand contains card of suitInPlay returns false
-            if( suitCheckingLoop(playerHand, suitInPlay) ){
-                
+            if(suitCheckingLoop(player, suitInPlay))
                 return false;
-            }
         }
         
         return true;
     }
     
-    boolean suitCheckingLoop( List<Cards> playerHand, String suitToCheck ){
+    boolean checkForHEART(LoopCount loopCount, Player player){
         
-        for( int k = 0; k < playerHand.size(); k++ ){
+        //If first card played is HEART
+        if(loopCount.trickLoopCount == 0){
+            
+            //If first card played is HEART and HEART is not broken
+            if(heartBroken == false){
+                
+                //to check if player hand contains all HEART card
+                for(int n = 0; n < player.playerHand.size(); n++){
+                
+                    if(!player.playerHand.get(n).suit.equals("HEART"))
+                        return ifHeartIsNotBroken(player.isPlayerHuman);
+                }
+            }
+        }else if(loopCount.trickLoopCount > 0){
+        
+            if(suitCheckingLoop(player, suitInPlay))
+                return false;
+        }
+        
+        if(player.isPlayerHuman == true)
+            System.out.println("\n\t\t\t\tHeart is borken!");
+        
+        return true;
+    }
+    
+    boolean suitCheckingLoop(Player player, String suitToCheck){
+        
+        for(int k = 0; k < player.playerHand.size(); k++){
 
-            if( playerHand.get(k).suit.equals(suitToCheck) ){
-                    
-                System.out.println("\nPlease play " + suitInPlay + "!\n");
+            if(player.playerHand.get(k).suit.equals(suitToCheck)){
+                
+                if( player.isPlayerHuman == true)
+                    System.out.println("\nPlease play " + suitInPlay + "!\n");
                 
                 return true;
             }
@@ -240,9 +273,10 @@ public class MainLoop{
         return false;
     }
     
-    boolean ifHeartIsNotBroken(){
-    
-        System.out.println("\nHeart is not broken! You can't play a HEART unless it's broken.\n");
+    boolean ifHeartIsNotBroken(boolean isPlayerHuman){
+        
+        if(isPlayerHuman == true)
+            System.out.println("\nHeart is not broken! You can't play a HEART unless it's broken.\n");
                 
         return false;
     }
@@ -254,9 +288,9 @@ public class MainLoop{
         System.out.println( "\n\t\t\t\tCurrent Hand: ");
     }
     
-    void showHand( Cards[] handContainer, int innerloop ){
+    void showHand(Cards[] handContainer, int trickLoopCount){
     
-        for( int i = 0; i <= innerloop; i++ )  
+        for( int i = 0; i <= trickLoopCount; i++ )  
             System.out.println( "\t\t\t\t" + handContainer[i]);
     }
     
@@ -268,7 +302,8 @@ public class MainLoop{
             System.out.println("\t\t\t\t"+ player[i].playerName + ": \t" + player[i].points);
     }
     
-    String isHeartBroken(){ //indicates if HEART is broken or not.
+    //indicates if HEART is broken or not.
+    String isHeartBroken(){ 
     
         if( heartBroken == true )
             return "Yes";
@@ -295,11 +330,13 @@ public class MainLoop{
             }
         }
         
-        pointsInTheTrick = determinePoints(pointsInTheTrick);//determines how many points to add to players point table;
+        //determines how many points to add to players point table;
+        pointsInTheTrick = determinePoints(pointsInTheTrick);
         
         player[sequence[indexOfBiggestCard]].points += pointsInTheTrick;
         
-        return player[sequence[indexOfBiggestCard]].playerName;//returns name of player holding heighest card in each TRICK 
+        //returns name of player holding heighest card in each TRICK 
+        return player[sequence[indexOfBiggestCard]].playerName;
     }
     
     int determinePoints(int pointsInTheTrick){
@@ -307,11 +344,11 @@ public class MainLoop{
         for( int j = 0; j < 4; j++ ){
             
             //if card is of HEART suit one point is added and if card is Q of CLUB then 13 points are added.
-            if( handContainer[j].suit.equals("HEART") || (handContainer[j].suit.equals("CLUB") && handContainer[j].value == 12) ){
+            if( handContainer[j].suit.equals("HEART") || (handContainer[j].suit.equals("SPADE") && handContainer[j].value == 12) ){
                 
                 if( handContainer[j].suit.equals("HEART") )
                     pointsInTheTrick++;
-                else if(handContainer[j].suit.equals("CLUB") && handContainer[j].value == 12 )
+                else if(handContainer[j].suit.equals("SPADE") && handContainer[j].value == 12 )
                     pointsInTheTrick += 13;
             }
         }
@@ -321,9 +358,36 @@ public class MainLoop{
     
     void addingCardsBackToDeck(List<Cards> cards){
         
-        for( int k = 0; k < 4; k++ ){
-
-            cards.add( handContainer[k] );//cards which are played are added back to the deck.
+        for( int k = 0; k < 4; k++ )
+            //cards which are played are added back to the deck.
+            cards.add( handContainer[k] );
+  
+    }
+    
+    int selectCardsForComputer(Player player, LoopCount loopCount){
+        
+        Random random = new Random();
+        
+        List<Integer> validCardsForComputerToPlay = new ArrayList(13);
+        
+        if(loopCount.mainLoopCount == 0 && loopCount.trickLoopCount == 0)
+            return 0;
+            
+        validCardsForComputerToPlay.clear();
+        
+        for(int i = 0; i < player.playerHand.size(); i++){
+            
+            if(validSuit(player, i, loopCount)){
+            
+                validCardsForComputerToPlay.add(i);
+                //uncomment the belove line to see no of playable cards for computer player
+                System.out.println(i+1);
+            }
         }
+        
+        //size for random.nextInt
+        int playableCards = validCardsForComputerToPlay.size();
+        
+        return validCardsForComputerToPlay.get(random.nextInt(playableCards));
     }
 }
